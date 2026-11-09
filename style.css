@@ -964,3 +964,27 @@ body.theme-light .enhancements-dock {
   box-shadow: 0 0 6px rgba(46, 204, 113, 0.8);
   z-index: 10;
 }
+
+.enhancements-dock {
+  position: static;
+  top: auto;
+  right: auto;
+  bottom: auto;
+  left: auto;
+  z-index: auto;
+  width: fit-content;
+  max-width: 100%;
+  margin: 12px 0 0 auto;
+  border-bottom: 1px solid var(--line);
+  box-shadow: none;
+  flex-wrap: nowrap;
+}
+
+@media (max-width: 640px) {
+  .enhancements-dock {
+    margin-top: 10px;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px;
+  }
+}
