@@ -1,4 +1,4 @@
-const CACHE_NAME = "nova-cache-v13";
+const CACHE_NAME = "nova-cache-v22";
 const STATIC_SHELL = [
   "/style.css",
   "/cabinet.css",
@@ -13,6 +13,7 @@ const STATIC_SHELL = [
   "/launcher.webmanifest",
   "/app-icon.svg",
   "/analytics-icon.svg",
+  "/background.svg",
   "/icon-192.png",
   "/icon-512.png",
   "/nova/style.css",
@@ -28,6 +29,7 @@ const STATIC_SHELL = [
   "/nova/launcher.webmanifest",
   "/nova/app-icon.svg",
   "/nova/analytics-icon.svg",
+  "/nova/background.svg",
   "/nova/icon-192.png",
   "/nova/icon-512.png"
 ];

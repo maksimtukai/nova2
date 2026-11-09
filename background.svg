@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="top-cyan" x1="0" y1="0" x2="0.8" y2="1">
+      <stop stop-color="#00d9f5" stop-opacity=".48"/>
+      <stop offset="1" stop-color="#0074bc" stop-opacity=".02"/>
+    </linearGradient>
+    <linearGradient id="top-violet" x1="1" y1="0" x2=".15" y2=".8">
+      <stop stop-color="#b000ff" stop-opacity=".65"/>
+      <stop offset=".62" stop-color="#5312dc" stop-opacity=".24"/>
+      <stop offset="1" stop-color="#171081" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="bottom-cyan" x1="0" y1=".4" x2=".7" y2=".65">
+      <stop stop-color="#00e8df" stop-opacity=".5"/>
+      <stop offset=".45" stop-color="#00aaff" stop-opacity=".34"/>
+      <stop offset="1" stop-color="#1237c8" stop-opacity=".08"/>
+    </linearGradient>
+    <linearGradient id="bottom-violet" x1="1" y1=".15" x2=".2" y2=".7">
+      <stop stop-color="#a000ff" stop-opacity=".58"/>
+      <stop offset=".55" stop-color="#5420df" stop-opacity=".2"/>
+      <stop offset="1" stop-color="#171081" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="cyan-line" x1="0" y1="0" x2="1" y2=".4">
+      <stop stop-color="#00fff0"/>
+      <stop offset=".55" stop-color="#00cfff"/>
+      <stop offset="1" stop-color="#2355ff"/>
+    </linearGradient>
+    <linearGradient id="purple-line" x1="1" y1="0" x2="0" y2=".2">
+      <stop stop-color="#ed20ff"/>
+      <stop offset=".6" stop-color="#8b24ff"/>
+      <stop offset="1" stop-color="#3b32d8"/>
+    </linearGradient>
+    <radialGradient id="center-shade">
+      <stop stop-color="#020713" stop-opacity=".05"/>
+      <stop offset=".8" stop-color="#020713" stop-opacity=".12"/>
+      <stop offset="1" stop-color="#020713" stop-opacity=".4"/>
+    </radialGradient>
+    <filter id="soft-glow" x="-40%" y="-100%" width="180%" height="300%">
+      <feGaussianBlur stdDeviation="13"/>
+    </filter>
+  </defs>
+
+  <path fill="#020713" d="M0 0h1600v900H0z"/>
+  <path fill="url(#top-cyan)" d="M0 0h390c-48 83-88 132-163 169C151 204 75 207 0 249z"/>
+  <path fill="#04101f" fill-opacity=".72" d="M0 188c198-70 318-33 500-79C711 56 800 36 951 0H330c-46 83-88 126-160 162C111 189 51 193 0 214z"/>
+  <path fill="url(#top-violet)" d="M810 0h790v238c-110-77-179-86-296-62-143 30-226 90-397 88-132-1-244-6-350 24 174-70 285-68 435-103C1137 150 1220 89 1280 0z"/>
+  <path fill="#120b48" fill-opacity=".52" d="M700 135c192-50 285-38 450-90 57-18 105-31 154-45h-210c-73 54-159 91-285 111-138 22-234 14-375 73 106-31 187-31 266-49z"/>
+
+  <path fill="url(#bottom-cyan)" d="M0 725c185-81 309-43 466 37 135 69 230 143 402 166 171 22 315-44 445-105 108-51 191-88 287-119v196H0z"/>
+  <path fill="url(#bottom-violet)" d="M1600 563c-169 55-261 126-426 171-169 46-276 43-390 137 166-79 271-66 416-89 149-23 255-77 400-125z"/>
+  <path fill="#06204f" fill-opacity=".65" d="M0 820c192-95 369-76 548-24 174 51 294 113 450 103 170-11 290-90 424-126 77-21 130-29 178-34v161H0z"/>
+  <path fill="#030b20" fill-opacity=".48" d="M0 880c165-76 325-94 478-66 157 28 266 90 417 93 204 4 332-75 484-104 79-15 151-19 221-15v112H0z"/>
+
+  <path d="M0 225c105-58 183-47 260-89C326 100 354 46 390 0" fill="none" stroke="#00dff5" stroke-opacity=".38" stroke-width="24" filter="url(#soft-glow)"/>
+  <path d="M0 225c105-58 183-47 260-89C326 100 354 46 390 0" fill="none" stroke="#08eaff" stroke-opacity=".8" stroke-width="2"/>
+  <path d="M0 725c185-81 309-43 466 37 135 69 230 143 402 166 171 22 315-44 445-105 108-51 191-88 287-119" fill="none" stroke="#00deff" stroke-opacity=".5" stroke-width="25" filter="url(#soft-glow)"/>
+  <path d="M0 725c185-81 309-43 466 37 135 69 230 143 402 166 171 22 315-44 445-105 108-51 191-88 287-119" fill="none" stroke="url(#cyan-line)" stroke-opacity=".92" stroke-width="2"/>
+  <path d="M880 765c119-62 202-74 294-103 147-45 264-111 426-144" fill="none" stroke="#a600ff" stroke-opacity=".42" stroke-width="26" filter="url(#soft-glow)"/>
+  <path d="M880 765c119-62 202-74 294-103 147-45 264-111 426-144" fill="none" stroke="url(#purple-line)" stroke-opacity=".9" stroke-width="2"/>
+  <path d="M952 0c140-28 251-56 342-104 80-42 131-91 206-132" fill="none" stroke="#9d13ff" stroke-opacity=".32" stroke-width="24" filter="url(#soft-glow)"/>
+  <path d="M952 0c140-28 251-56 342-104 80-42 131-91 206-132" fill="none" stroke="url(#purple-line)" stroke-opacity=".82" stroke-width="2"/>
+
+  <path fill="url(#center-shade)" d="M0 0h1600v900H0z"/>
+</svg>

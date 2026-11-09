@@ -25,57 +25,20 @@ body {
   min-height: 100vh;
   font-family: "Manrope", sans-serif;
   color: var(--text);
-  background:
-    radial-gradient(circle at calc(12% + var(--parallax-x)) calc(10% + var(--parallax-y)), rgba(124, 240, 200, 0.16), transparent 30%),
-    radial-gradient(circle at calc(85% + var(--parallax-x) * -0.5) calc(15% + var(--parallax-y) * -0.5), rgba(255, 143, 92, 0.18), transparent 24%),
-    linear-gradient(145deg, #09101d 0%, #0f1730 45%, #0a1224 100%);
-}
-
-body.no-parallax {
-  --parallax-x: 0px;
-  --parallax-y: 0px;
-  background: linear-gradient(145deg, #09101d 0%, #0f1730 45%, #0a1224 100%);
-}
-
-body.no-parallax::before {
-  opacity: 0.45;
+  background: #020713;
 }
 
 body::before {
   content: "";
   position: fixed;
   inset: 0;
-  background-image:
-    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-  background-size: 36px 36px;
-  mask-image:
-    radial-gradient(circle 220px at var(--mouse-x) var(--mouse-y), black 0%, transparent 100%),
-    radial-gradient(circle at center, black 55%, transparent 95%);
-  mask-composite: add;
-  -webkit-mask-image:
-    radial-gradient(circle 220px at var(--mouse-x) var(--mouse-y), black 0%, transparent 100%),
-    radial-gradient(circle at center, black 55%, transparent 95%);
-  -webkit-mask-composite: source-over;
+  z-index: 0;
+  background: url("background.svg?v=2") center / cover no-repeat;
   pointer-events: none;
-  transition: mask-position .05s;
 }
 
-/* Плавающие glow-пятна */
-.glow-blob {
-  position: fixed;
-  border-radius: 50%;
-  filter: blur(80px);
-  opacity: 0.18;
-  pointer-events: none;
-  z-index: 0;
-  animation: blobFloat linear infinite;
-}
-@keyframes blobFloat {
-  0%   { transform: translate(0, 0) scale(1); }
-  33%  { transform: translate(40px, -30px) scale(1.08); }
-  66%  { transform: translate(-30px, 20px) scale(0.95); }
-  100% { transform: translate(0, 0) scale(1); }
+body.theme-light::before {
+  background: none;
 }
 
 .page-shell {
