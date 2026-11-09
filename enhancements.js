@@ -242,7 +242,7 @@
 
     `;
 
-    document.body.appendChild(dock);
+    const nav = document.querySelector(".nav"); if (nav) nav.insertAdjacentElement("afterend", dock); else document.body.appendChild(dock);
 
 
 
