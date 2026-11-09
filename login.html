@@ -59,16 +59,20 @@
             </label>
             <button class="btn-primary" type="submit">Войти</button>
             <p class="auth-meta" style="margin-top: 12px;">
-              <a class="auth-link" href="#" id="showResetPassword">Сбросить пароль</a>
+              <a class="auth-link" href="#" id="showResetPassword">Изменить пароль</a>
             </p>
             <p class="form-message" id="loginMessage"></p>
           </form>
 
           <form id="resetPasswordForm" class="auth-form is-hidden" autocomplete="off">
-            <h2>Сброс пароля</h2>
+            <h2>Изменение пароля</h2>
             <label class="field">
               <span>Email</span>
               <input type="email" name="email" placeholder="you@mail.com" autocomplete="off" required>
+            </label>
+            <label class="field">
+              <span>Текущий пароль</span>
+              <input type="password" name="currentPassword" placeholder="Введите текущий пароль" autocomplete="current-password" required>
             </label>
             <label class="field">
               <span>Новый пароль</span>
@@ -78,7 +82,7 @@
               <span>Повторите новый пароль</span>
               <input type="password" name="confirmNewPassword" minlength="6" placeholder="Повторите пароль" autocomplete="new-password" required>
             </label>
-            <button class="btn-primary" type="submit">Обновить пароль</button>
+            <button class="btn-primary" type="submit">Изменить пароль</button>
             <p class="auth-meta" style="margin-top: 12px;">
               <a class="auth-link" href="#" id="cancelResetPassword">Назад ко входу</a>
             </p>
@@ -97,4 +101,3 @@
   <script src="mobile-menu.js"></script>
 </body>
 </html>
-

@@ -729,8 +729,10 @@ function readLocalUsers() {
 function writeLocalUsers(users) {
   try {
     fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), 'utf8');
+    return true;
   } catch (err) {
     logError('writeLocalUsers error: ' + err.message);
+    return false;
   }
 }
 
@@ -986,85 +988,39 @@ async function handleAuth(action, req, res) {
 
     if (action === 'reset') {
       const email = String(body.email || '').trim().toLowerCase();
+      const currentPass = String(body.currentPassword || '');
       const newPass = String(body.newPassword || '');
+      if (!email || !currentPass || !newPass) return sendJson(res, 400, { message: 'Заполните все поля.' });
       if (newPass.length < 6) return sendJson(res, 400, { message: 'Пароль должен быть от 6 символов.' });
 
-      const fallbackName = (() => {
-        const left = String(email.split('@')[0] || '').trim();
-        const clean = left.replace(/[^\wА-Яа-яёЁ-]+/g, '').slice(0, 32);
-        return clean || 'Пользователь';
-      })();
-      
       if (supabase) {
         const { user: existingUser, error: lookupError } = await findSupabaseUser(email);
-        if (lookupError && !isSupabaseSchemaCacheError(lookupError)) {
-          if (!IS_VERCEL) {
-            const idx = findLocalUserIndex(email, users);
-            if (idx < 0) {
-              users.push({ name: fallbackName, email, password: hashPassword(newPass) });
-              writeLocalUsers(users);
-              return sendJson(res, 200, { message: 'Аккаунт создан. Теперь можно войти.' });
-            }
-            users[idx].password = hashPassword(newPass);
-            writeLocalUsers(users);
-            return sendJson(res, 200, { message: 'Пароль обновлён.' });
-          }
+        if (lookupError) {
+          if (isSupabaseSchemaCacheError(lookupError)) return sendJson(res, 500, { message: supabaseSetupHint() });
+          return sendJson(res, 500, { message: 'Ошибка базы данных. Попробуйте позже.' });
+        }
+        if (!existingUser || !verifyPassword(currentPass, existingUser.password)) {
+          return sendJson(res, 401, { message: 'Неверный email или текущий пароль.' });
+        }
+
+        const { data: updatedUser, error } = await supabase
+          .from('users')
+          .update({ password: hashPassword(newPass) })
+          .eq('email', existingUser.email)
+          .select('email')
+          .maybeSingle();
+        if (error) {
+          if (isSupabaseSchemaCacheError(error)) return sendJson(res, 500, { message: supabaseSetupHint() });
           return sendJson(res, 500, { message: 'Ошибка обновления пароля. Попробуйте позже.' });
         }
-        if (existingUser) {
-          const { error } = await supabase
-            .from('users')
-            .update({ password: hashPassword(newPass), email })
-            .eq('email', existingUser.email);
-          if (error) {
-            if (!IS_VERCEL && isSupabaseSchemaCacheError(error)) {
-              const idx = findLocalUserIndex(email, users);
-              if (idx < 0) {
-                users.push({ name: fallbackName, email, password: hashPassword(newPass) });
-              } else {
-                users[idx].password = hashPassword(newPass);
-              }
-              writeLocalUsers(users);
-              return sendJson(res, 200, { message: 'Пароль обновлён.' });
-            }
-            if (isSupabaseSchemaCacheError(error)) return sendJson(res, 500, { message: supabaseSetupHint() });
-            return sendJson(res, 500, { message: 'Ошибка обновления пароля. Попробуйте позже.' });
-          }
-          const localUser = findLocalUser(email, users);
-          if (localUser) {
-            localUser.password = hashPassword(newPass);
-            localUser.email = email;
-            writeLocalUsers(users);
-          }
-          return sendJson(res, 200, { message: 'Пароль обновлён.' });
-        }
-        const { error: insertError } = await supabase
-          .from('users')
-          .insert({ name: fallbackName, email, password: hashPassword(newPass) });
-        if (insertError) {
-          if (!IS_VERCEL) {
-            const idx = findLocalUserIndex(email, users);
-            if (idx < 0) {
-              users.push({ name: fallbackName, email, password: hashPassword(newPass) });
-            } else {
-              users[idx].password = hashPassword(newPass);
-            }
-            writeLocalUsers(users);
-            return sendJson(res, 200, { message: idx < 0 ? 'Аккаунт создан. Теперь можно войти.' : 'Пароль обновлён.' });
-          }
-          if (isSupabaseSchemaCacheError(insertError)) return sendJson(res, 500, { message: supabaseSetupHint() });
-          return sendJson(res, 500, { message: 'Не удалось создать аккаунт. Попробуйте позже.' });
-        }
+        if (!updatedUser) return sendJson(res, 500, { message: 'Не удалось обновить пароль. Проверьте настройки базы данных.' });
       } else {
         const idx = findLocalUserIndex(email, users);
-        if (idx < 0) {
-          users.push({ name: fallbackName, email, password: hashPassword(newPass) });
-          writeUsers(users);
-          return sendJson(res, 200, { message: 'Аккаунт создан. Теперь можно войти.' });
+        if (idx < 0 || !verifyPassword(currentPass, users[idx].password)) {
+          return sendJson(res, 401, { message: 'Неверный email или текущий пароль.' });
         }
         users[idx].password = hashPassword(newPass);
-        users[idx].email = email;
-        writeUsers(users);
+        if (!writeLocalUsers(users)) return sendJson(res, 500, { message: 'Не удалось сохранить новый пароль. Попробуйте позже.' });
       }
       return sendJson(res, 200, { message: 'Пароль обновлён.' });
     }

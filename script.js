@@ -332,24 +332,25 @@ function bindPasswordReset() {
 
     const fd                = new FormData(resetPasswordForm);
     const email             = String(fd.get("email") || "").trim().toLowerCase();
+    const currentPassword   = String(fd.get("currentPassword") || "");
     const newPassword       = String(fd.get("newPassword") || "");
     const confirmNewPassword = String(fd.get("confirmNewPassword") || "");
 
-    if (!email || !newPassword) { setMessage(resetPasswordMessage, "Заполните все поля.", "is-error"); return; }
+    if (!email || !currentPassword || !newPassword) { setMessage(resetPasswordMessage, "Заполните все поля.", "is-error"); return; }
     if (newPassword.length < 6) { setMessage(resetPasswordMessage, "Пароль должен быть от 6 символов.", "is-error"); return; }
     if (newPassword !== confirmNewPassword) { setMessage(resetPasswordMessage, "Пароли не совпадают.", "is-error"); return; }
 
-    setMessage(resetPasswordMessage, "Обновление...", "");
-    const { ok, data } = await apiAuth("reset", { email, newPassword });
+    setMessage(resetPasswordMessage, "Изменение пароля...", "");
+    const { ok, data } = await apiAuth("reset", { email, currentPassword, newPassword });
     if (!ok) {
-      trackAnalytics("password_reset_failed", { meta: { email, reason: data.message || "reset_failed" } });
+      trackAnalytics("password_change_failed", { meta: { email, reason: data.message || "password_change_failed" } });
       setMessage(resetPasswordMessage, data.message || "Ошибка.", "is-error");
       return;
     }
 
     resetPasswordForm.reset();
-    trackAnalytics("password_reset_success", { meta: { email } });
-    setMessage(resetPasswordMessage, "Пароль обновлён. Войдите.", "is-success");
+    trackAnalytics("password_change_success", { meta: { email } });
+    setMessage(resetPasswordMessage, "Пароль изменён. Войдите с новым паролем.", "is-success");
     setTimeout(() => { loginForm?.reset?.(); showReset(false); }, 600);
   });
 }
