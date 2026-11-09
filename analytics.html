@@ -101,6 +101,42 @@
       padding-top: 16px;
       border-top: 1px solid rgba(99,201,162,0.1);
     }
+    .sidebar-action {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 0;
+      border: 0;
+      border-radius: 8px;
+      background: transparent;
+      color: #7beab7;
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
+    }
+    .sidebar-action:hover,
+    .sidebar-action:focus-visible {
+      color: #d9fcef;
+      background: rgba(77,255,177,0.08);
+      outline: none;
+    }
+    dialog {
+      width: min(440px, calc(100% - 32px));
+      border: 1px solid rgba(99,201,162,0.3);
+      border-radius: 18px;
+      padding: 24px;
+      background: #0b1412;
+      color: #e9fff5;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.65);
+    }
+    dialog::backdrop { background: rgba(0,0,0,0.72); backdrop-filter: blur(4px); }
+    dialog h2 { margin: 0 0 12px; }
+    dialog p, dialog li { color: #9dc5b5; line-height: 1.6; }
+    dialog ul { padding-left: 20px; }
+    .dialog-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+    .setting-row { display: flex; align-items: center; gap: 10px; color: #c8e8da; }
+    .setting-row input { accent-color: #11aa67; }
     .status-row {
       display: flex;
       align-items: center;
@@ -483,6 +519,15 @@
       .bar-row { grid-template-columns: minmax(0,120px) 1fr 40px; }
       .info-grid { grid-template-columns: 1fr; }
     }
+    @media print {
+      body { display: block; background: #fff; color: #111; }
+      body::before, body::after, .sidebar, .controls, .message { display: none !important; }
+      .main-content, .shell { max-width: none; padding: 0; }
+      .dashboard { display: block; }
+      .card, .panel { break-inside: avoid; margin: 0 0 14px; color: #111; box-shadow: none; background: #fff; border: 1px solid #bbb; }
+      .metric-title, .metric-note, .card-meta, .info-label, th { color: #444; }
+      .metric-value, .info-value, td, .event-main { color: #111; }
+    }
   </style>
 </head>
 <body>
@@ -580,11 +625,11 @@
       </a>
     </div>
     <div class="sidebar-footer">
-      <div class="status-row">
+      <button class="sidebar-action" id="sidebarExportBtn" type="button">
         <span class="status-dot"></span>
         <span>Export Data</span>
-      </div>
-      <div class="status-row">
+      </button>
+      <button class="sidebar-action" id="sidebarReportBtn" type="button">
         <div class="nav-icon">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
@@ -592,8 +637,8 @@
           </svg>
         </div>
         <span>Reports</span>
-      </div>
-      <div class="status-row">
+      </button>
+      <button class="sidebar-action" id="sidebarSettingsBtn" type="button">
         <div class="nav-icon">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="12" cy="12" r="3"></circle>
@@ -601,8 +646,8 @@
           </svg>
         </div>
         <span>Settings</span>
-      </div>
-      <div class="status-row">
+      </button>
+      <button class="sidebar-action" id="sidebarHelpBtn" type="button">
         <div class="nav-icon">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="12" cy="12" r="10"></circle>
@@ -611,7 +656,7 @@
           </svg>
         </div>
         <span>Help</span>
-      </div>
+      </button>
       <div style="margin-top:16px;">
         <div class="status-label">Server Status</div>
         <div class="status-value" id="sidebarServerStatus">Online</div>
@@ -622,6 +667,30 @@
       </div>
     </div>
   </div>
+  <dialog id="settingsDialog">
+    <h2>Настройки аналитики</h2>
+    <p>Настройки сохраняются в этом браузере.</p>
+    <label class="setting-row">
+      <input id="autoRefreshSetting" type="checkbox">
+      Автоматически обновлять данные каждые 15 секунд
+    </label>
+    <div class="dialog-actions">
+      <button class="alt" id="forgetKeyBtn" type="button">Забыть ключ</button>
+      <button type="button" data-close-dialog="settingsDialog">Готово</button>
+    </div>
+  </dialog>
+  <dialog id="helpDialog">
+    <h2>Помощь по аналитике</h2>
+    <ul>
+      <li>Введите ключ администратора и нажмите «Загрузить».</li>
+      <li>Выберите период: сегодня, неделя, месяц или всё время.</li>
+      <li>«Export Data» скачивает CSV, а «Reports» открывает страницу печати.</li>
+      <li>Кнопка «Очистить» удаляет данные аналитики после подтверждения.</li>
+    </ul>
+    <div class="dialog-actions">
+      <button type="button" data-close-dialog="helpDialog">Понятно</button>
+    </div>
+  </dialog>
   <div class="main-content">
     <div class="shell">
       <div class="toolbar">
@@ -799,6 +868,7 @@
   <script>
     const API_ROOT = location.protocol === "file:" ? "http://localhost:43219/api" : "/api";
     const KEY_STORAGE = "nova_analytics_admin_key";
+    const AUTO_REFRESH_STORAGE = "nova_analytics_auto_refresh";
     const DONUT_COLORS = ["#4dffb1", "#14d67b", "#14b6ff", "#9c6bff", "#ff8d5d", "#ffd166"];
     const state = {
       adminKey: "",
@@ -1076,26 +1146,38 @@
         setMessage("Сначала загрузите данные.", true);
         return;
       }
-      const lines = [
-        "section,label,value",
-        `summary,totalViews,${state.data.summary.totalViews}`,
-        `summary,uniqueVisitors,${state.data.summary.uniqueVisitors}`,
-        `summary,onlineUsers,${state.data.summary.onlineUsers}`,
-        `summary,avgSessionSec,${state.data.summary.avgSessionSec}`,
-        `summary,bounceRate,${state.data.summary.bounceRate}`
-      ];
-      (state.data.topPages || []).forEach((item) => lines.push(`topPages,"${item.path}",${item.count}`));
-      (state.data.topReferrers || []).forEach((item) => lines.push(`topReferrers,"${item.referrer}",${item.count}`));
-      (state.data.browsers || []).forEach((item) => lines.push(`browsers,"${item.label}",${item.count}`));
-      (state.data.devices || []).forEach((item) => lines.push(`devices,"${item.label}",${item.count}`));
-      (state.data.countriesList || []).forEach((item) => lines.push(`countries,"${item.country}",${item.count}`));
-      const blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8" });
+      const csvCell = (value) => `"${String(value ?? "").replace(/"/g, '""')}"`;
+      const lines = [["section", "label", "value"].map(csvCell).join(",")];
+      const addRows = (section, items, labelKey, valueKey) => {
+        (items || []).forEach((item) => {
+          lines.push([section, item[labelKey], item[valueKey]].map(csvCell).join(","));
+        });
+      };
+      [
+        ["totalViews", state.data.summary.totalViews],
+        ["totalEvents", state.data.summary.totalEvents],
+        ["uniqueVisitors", state.data.summary.uniqueVisitors],
+        ["sessions", state.data.summary.sessions],
+        ["onlineUsers", state.data.summary.onlineUsers],
+        ["avgSessionSec", state.data.summary.avgSessionSec],
+        ["bounceRate", state.data.summary.bounceRate]
+      ].forEach(([label, value]) => lines.push(["summary", label, value].map(csvCell).join(",")));
+      addRows("timeline", state.data.timeline, "label", "value");
+      addRows("weekday", state.data.weekday, "label", "value");
+      addRows("topPages", state.data.topPages, "path", "count");
+      addRows("topReferrers", state.data.topReferrers, "referrer", "count");
+      addRows("browsers", state.data.browsers, "label", "count");
+      addRows("devices", state.data.devices, "label", "count");
+      addRows("operatingSystems", state.data.os, "label", "count");
+      addRows("countries", state.data.countriesList, "country", "count");
+      addRows("languages", state.data.languages, "label", "count");
+      const blob = new Blob(["\ufeff", lines.join("\r\n")], { type: "text/csv;charset=utf-8" });
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
       link.download = `analytics-${state.range}.csv`;
       link.click();
-      URL.revokeObjectURL(url);
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
       setMessage("CSV экспортирован.");
     }
 
@@ -1109,6 +1191,8 @@
 
     function startAutoRefresh() {
       if (state.timer) clearInterval(state.timer);
+      state.timer = null;
+      if (localStorage.getItem(AUTO_REFRESH_STORAGE) === "false") return;
       state.timer = setInterval(() => {
         if (state.adminKey) loadStats();
       }, 15000);
@@ -1118,6 +1202,35 @@
     document.getElementById("refreshBtn").addEventListener("click", loadStats);
     document.getElementById("clearBtn").addEventListener("click", clearAnalytics);
     document.getElementById("exportBtn").addEventListener("click", exportCsv);
+    document.getElementById("sidebarExportBtn").addEventListener("click", exportCsv);
+    document.getElementById("sidebarReportBtn").addEventListener("click", () => {
+      if (!state.data) {
+        setMessage("Сначала загрузите данные.", true);
+        return;
+      }
+      window.print();
+    });
+    document.getElementById("sidebarSettingsBtn").addEventListener("click", () => {
+      document.getElementById("autoRefreshSetting").checked = localStorage.getItem(AUTO_REFRESH_STORAGE) !== "false";
+      document.getElementById("settingsDialog").showModal();
+    });
+    document.getElementById("sidebarHelpBtn").addEventListener("click", () => {
+      document.getElementById("helpDialog").showModal();
+    });
+    document.getElementById("autoRefreshSetting").addEventListener("change", (event) => {
+      localStorage.setItem(AUTO_REFRESH_STORAGE, String(event.target.checked));
+      startAutoRefresh();
+      setMessage(event.target.checked ? "Автообновление включено." : "Автообновление выключено.");
+    });
+    document.getElementById("forgetKeyBtn").addEventListener("click", () => {
+      localStorage.removeItem(KEY_STORAGE);
+      document.getElementById("keyInput").value = "";
+      state.adminKey = "";
+      setMessage("Сохранённый ключ удалён из этого браузера.");
+    });
+    document.querySelectorAll("[data-close-dialog]").forEach((button) => {
+      button.addEventListener("click", () => document.getElementById(button.dataset.closeDialog).close());
+    });
     document.getElementById("keyInput").addEventListener("keydown", (event) => {
       if (event.key === "Enter") loadStats();
     });
@@ -1138,7 +1251,20 @@
         document.querySelectorAll(".nav-item").forEach((nav) => nav.classList.remove("active"));
         item.classList.add("active");
         const section = item.dataset.section;
+        const targets = {
+          dashboard: ".toolbar",
+          visitors: "#recentVisitorsTable",
+          events: "#liveEvents",
+          pages: "#topPages",
+          referrers: "#topReferrers",
+          browsers: "#browserDonut",
+          countries: "#countryBars",
+          devices: "#deviceDonut",
+          realtime: "#liveEvents"
+        };
+        const target = document.querySelector(targets[section] || ".toolbar");
         document.querySelector(".title-wrap h1").textContent = section.charAt(0).toUpperCase() + section.slice(1);
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
       });
     });
 
