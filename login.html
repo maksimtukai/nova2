@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#09101d">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Nova Studio">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/svg+xml" href="app-icon.svg">
+  <title>Вход • Nova Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="page-shell">
+    <header class="hero">
+      <nav class="nav">
+        <div class="brand">Nova Studio</div>
+        <div class="nav-links">
+          <a class="nav-link" href="index.html">Главная</a>
+        </div>
+        <div class="nav-auth">
+          <a id="loginLink" class="login-icon-btn" href="login.html" title="Вход">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+          </a>
+          <div id="userChip" class="user-chip is-hidden" title="Вы уже вошли">
+            <span class="user-avatar-wrap">
+              <span id="userIcon" class="user-icon"></span>
+              <span class="user-online-dot"></span>
+            </span>
+            <span id="userName" class="user-name"></span>
+          </div>
+        </div>
+        <button class="burger-btn" type="button" aria-label="Открыть меню" aria-expanded="false">☰</button>
+        <div class="mobile-menu" aria-label="Мобильное меню">
+          <a class="auth-link" href="index.html">Главная</a>
+        </div>
+      </nav>
+
+      <div style="padding-top: 24px;">
+        <section class="auth-card" aria-label="Форма входа">
+          <p class="auth-meta">
+            Нет аккаунта? <a class="auth-link" href="index.html">Регистрация</a>
+          </p>
+
+          <form id="loginForm" class="auth-form" autocomplete="off">
+            <h2>Вход в аккаунт</h2>
+            <label class="field">
+              <span>Email</span>
+              <input type="email" name="email" placeholder="you@mail.com" autocomplete="off" required>
+            </label>
+            <label class="field">
+              <span>Пароль</span>
+              <input type="password" name="password" placeholder="Введите пароль" autocomplete="new-password" required>
+            </label>
+            <button class="btn-primary" type="submit">Войти</button>
+            <p class="auth-meta" style="margin-top: 12px;">
+              <a class="auth-link" href="#" id="showResetPassword">Сбросить пароль</a>
+            </p>
+            <p class="form-message" id="loginMessage"></p>
+          </form>
+
+          <form id="resetPasswordForm" class="auth-form is-hidden" autocomplete="off">
+            <h2>Сброс пароля</h2>
+            <label class="field">
+              <span>Email</span>
+              <input type="email" name="email" placeholder="you@mail.com" autocomplete="off" required>
+            </label>
+            <label class="field">
+              <span>Новый пароль</span>
+              <input type="password" name="newPassword" minlength="6" placeholder="Минимум 6 символов" autocomplete="new-password" required>
+            </label>
+            <label class="field">
+              <span>Повторите новый пароль</span>
+              <input type="password" name="confirmNewPassword" minlength="6" placeholder="Повторите пароль" autocomplete="new-password" required>
+            </label>
+            <button class="btn-primary" type="submit">Обновить пароль</button>
+            <p class="auth-meta" style="margin-top: 12px;">
+              <a class="auth-link" href="#" id="cancelResetPassword">Назад ко входу</a>
+            </p>
+            <p class="form-message" id="resetPasswordMessage"></p>
+          </form>
+        </section>
+      </div>
+    </header>
+  </div>
+
+  <script src="analytics.js"></script>
+  <script src="script.js?v=4"></script>
+  <script src="pwa.js"></script>
+  <script src="enhancements.js"></script>
+  <script src="interactions.js"></script>
+  <script src="mobile-menu.js"></script>
+</body>
+</html>
+
