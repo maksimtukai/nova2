@@ -184,30 +184,6 @@
     }
     .ticker-item:hover { color: #7cf0c8; }
 
-    /* Nova Space */
-    .nova-space-section {
-      padding: 60px 0 20px;
-    }
-    .nova-space-card {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(124,240,200,0.15);
-      border-radius: 24px;
-      padding: 52px 52px;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 48px;
-      align-items: center;
-      position: relative;
-      overflow: hidden;
-    }
-    .nova-space-card::before {
-      content: '';
-      position: absolute;
-      top: -80px; left: -80px;
-      width: 300px; height: 300px;
-      background: radial-gradient(circle, rgba(124,240,200,0.08) 0%, transparent 70%);
-      pointer-events: none;
-    }
     .nova-space-badge {
       display: inline-block;
       font-size: 11px;
@@ -219,47 +195,7 @@
       padding: 4px 14px;
       margin-bottom: 20px;
     }
-    .nova-space-title {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: clamp(26px, 3vw, 38px);
-      font-weight: 700;
-      line-height: 1.2;
-      color: #edf2ff;
-      margin-bottom: 16px;
-    }
     .nova-space-accent { color: #7cf0c8; }
-    .nova-space-text {
-      font-size: 15px;
-      color: #6b7ea8;
-      line-height: 1.7;
-      margin-bottom: 8px;
-    }
-    .nova-space-features {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-    .nsf-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 16px;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.07);
-      border-radius: 14px;
-      padding: 16px 20px;
-      transition: border-color .2s, transform .2s;
-    }
-    .nsf-item:hover {
-      border-color: rgba(124,240,200,0.25);
-      transform: translateX(4px);
-    }
-    .nsf-icon { font-size: 24px; flex-shrink: 0; margin-top: 2px; }
-    .nsf-title { font-size: 14px; font-weight: 700; color: #edf2ff; margin-bottom: 4px; }
-    .nsf-desc  { font-size: 12px; color: #4b5563; line-height: 1.5; }
-
-    @media (max-width: 700px) {
-      .nova-space-card { grid-template-columns: 1fr; padding: 32px 24px; }
-    }
 
     /* Nova Vision */
     .nova-vision-section {
@@ -444,42 +380,6 @@
         </div>
       </div>
 
-      <!-- Nova Space блок -->
-      <div class="nova-space-section">
-        <div class="nova-space-card">
-          <div class="nova-space-left">
-            <div class="nova-space-badge">Nova Space</div>
-            <h2 class="nova-space-title">Твой личный кабинет<br>в <span class="nova-space-accent">Nova Space</span></h2>
-            <p class="nova-space-text">Отслеживай этапы разработки своего проекта в реальном времени, управляй своим аккаунтом и храни все документы в одном месте.</p>
-          </div>
-          <div class="nova-space-right">
-            <div class="nova-space-features">
-              <div class="nsf-item">
-                <span class="nsf-icon">📊</span>
-                <div>
-                  <div class="nsf-title">Прогресс проекта</div>
-                  <div class="nsf-desc">Видишь каждый этап разработки в реальном времени</div>
-                </div>
-              </div>
-              <div class="nsf-item">
-                <span class="nsf-icon">�</span>
-                <div>
-                  <div class="nsf-title">Аккаунт пользователя</div>
-                  <div class="nsf-desc">Безопасный вход и быстрый доступ к личному кабинету</div>
-                </div>
-              </div>
-              <div class="nsf-item">
-                <span class="nsf-icon">📁</span>
-                <div>
-                  <div class="nsf-title">Все документы</div>
-                  <div class="nsf-desc">Договоры, макеты и исходники в одном хранилище</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
     </header>
 
   </div>
@@ -637,7 +537,7 @@
     function goProjects(e) {
       if (e && e.stopPropagation) e.stopPropagation();
       closeMenu();
-      var target = document.getElementById('logged-sections') || document.querySelector('.nova-space-section');
+      var target = document.getElementById('logged-sections');
       if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
