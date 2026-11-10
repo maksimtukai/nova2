@@ -922,6 +922,7 @@ async function handleAuth(action, req, res) {
       if (supabase) {
         const { data: existingUser, error: lookupError } = await findSupabaseUser(email);
         if (lookupError && !isSupabaseSchemaCacheError(lookupError)) {
+          console.error('[auth] Supabase registration lookup failed', { code: lookupError.code || 'unknown' });
           return sendJson(res, 500, { message: 'Ошибка регистрации.' });
         }
         if (existingUser) return sendJson(res, 409, { message: 'Email уже зарегистрирован.' });
@@ -937,6 +938,7 @@ async function handleAuth(action, req, res) {
             return sendJson(res, 200, { message: 'Регистрация успешна.' });
           }
           if (isSupabaseSchemaCacheError(error)) return sendJson(res, 500, { message: supabaseSetupHint() });
+          console.error('[auth] Supabase registration insert failed', { code: error.code || 'unknown' });
           return sendJson(res, 500, { message: 'Ошибка регистрации.' });
         }
       } else {
