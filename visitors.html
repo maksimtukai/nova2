@@ -243,6 +243,8 @@
   let adminKey = '';
   let sinceIndex = 0;
   let pollTimer = null;
+  let isFetchingLogs = false;
+  const POLL_INTERVAL = 1000;
   let allEntries = [];
   let seenIPs = new Set();
 
@@ -289,10 +291,12 @@
     } catch { sinceIndex = 0; }
     document.getElementById('terminal').innerHTML = '<div id="empty">// подключено — ожидаем новых посетителей...</div>';
     updateStats();
-    if (!pollTimer) pollTimer = setInterval(() => fetchLogs(false), 5000);
+    if (!pollTimer) pollTimer = setInterval(() => fetchLogs(false), POLL_INTERVAL);
   }
 
   async function fetchLogs(initial = false) {
+    if (isFetchingLogs) return;
+    isFetchingLogs = true;
     try {
       const text = await fetchLogText();
       showMsg('');
@@ -323,10 +327,12 @@
       updateStats();
 
       if (!pollTimer) {
-        pollTimer = setInterval(() => fetchLogs(false), 2000);
+        pollTimer = setInterval(() => fetchLogs(false), POLL_INTERVAL);
       }
     } catch(err) {
       showMsg('ошибка: ' + err.message);
+    } finally {
+      isFetchingLogs = false;
     }
   }
 
@@ -410,7 +416,7 @@
       btn.style.color = '#00ff41';
     } else {
       if (adminKey) {
-        pollTimer = setInterval(() => fetchLogs(false), 5000);
+        pollTimer = setInterval(() => fetchLogs(false), POLL_INTERVAL);
         document.getElementById('live-dot').style.display = '';
       }
       btn.textContent = 'PAUSE';

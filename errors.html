@@ -21,6 +21,11 @@
       background: #0f0f0f; border-bottom: 1px solid #1a1a1a;
       padding: 6px 16px; display: flex; align-items: center; gap: 10px; flex-shrink: 0;
     }
+    #admin-key {
+      width: 190px; padding: 4px 8px; border: 1px solid #333; border-radius: 3px;
+      background: #111; color: #aaa; font: inherit; outline: none;
+    }
+    #admin-key:focus { border-color: #ff4444; }
     .btn {
       background: #1a0000; border: 1px solid #ff4444; color: #ff4444;
       font-family: inherit; font-size: 11px; padding: 4px 14px;
@@ -62,6 +67,8 @@
 </div>
 
 <div id="toolbar">
+  <input id="admin-key" type="password" autocomplete="current-password" placeholder="Ключ администратора"
+    onkeydown="if(event.key==='Enter')loadErrors()">
   <button class="btn" onclick="loadErrors()">ОБНОВИТЬ</button>
   <button class="btn btn-gray" onclick="clearView()">ОЧИСТИТЬ ВИД</button>
   <span id="status">загрузка...</span>
@@ -74,29 +81,39 @@
 
 <script>
   if (location.protocol === 'file:') { location.replace('http://localhost:43219/nova/errors.html'); }
-  const LOG_URL = '/nova/errors.log';
+  const LOG_URL = '/api/errors';
   let allErrors = [];
 
   async function loadErrors() {
     document.getElementById('status').textContent = 'обновление...';
+    const key = document.getElementById('admin-key').value.trim();
+    if (!key) {
+      document.getElementById('status').textContent = 'введите ключ администратора';
+      document.getElementById('count').textContent = '';
+      return;
+    }
     try {
-      const res = await fetch(LOG_URL + '?_=' + Date.now(), { headers: { 'ngrok-skip-browser-warning': 'true' } });
-      if (res.status === 404) {
-        document.getElementById('status').textContent = 'лог пуст';
+      const res = await fetch(LOG_URL + '?_=' + Date.now(), {
+        headers: {
+          'X-Admin-Key': key,
+          'ngrok-skip-browser-warning': 'true'
+        }
+      });
+      if (res.status === 401) {
+        document.getElementById('status').textContent = 'неверный ключ администратора';
+        document.getElementById('count').textContent = '';
+        allErrors = [];
         render([]);
         return;
       }
-      const text = await res.text();
-      const lines = text.trim() ? text.trim().split('\n') : [];
-      allErrors = [];
-      lines.forEach(line => {
-        try { allErrors.push(JSON.parse(line.trim())); } catch {}
-      });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      allErrors = await res.json();
       render(allErrors);
       document.getElementById('status').textContent = 'обновлено ' + new Date().toLocaleTimeString();
       document.getElementById('count').textContent = allErrors.length + ' ошибок';
     } catch(e) {
       document.getElementById('status').textContent = 'ошибка загрузки: ' + e.message;
+      document.getElementById('count').textContent = '';
     }
   }
 

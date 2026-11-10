@@ -1037,9 +1037,14 @@ const LOG_SKIP = /\.(log)$/i;
 // Log batching to reduce I/O operations
 const logBatch = [];
 const LOG_BATCH_SIZE = 50;
-const LOG_BATCH_INTERVAL = 5000; // 5 seconds
+const LOG_BATCH_DELAY = 250;
+let logFlushTimer = null;
 
 function flushLogBatch() {
+  if (logFlushTimer) {
+    clearTimeout(logFlushTimer);
+    logFlushTimer = null;
+  }
   if (logBatch.length === 0) return;
   const batch = logBatch.splice(0, logBatch.length);
   fs.appendFile(LOG_FILE, batch.join('') + '\n', 'utf8', (err) => {
@@ -1047,7 +1052,6 @@ function flushLogBatch() {
   });
 }
 
-setInterval(flushLogBatch, LOG_BATCH_INTERVAL);
 const STATIC_DENY = new Set([
   '.env',
   'admin.key',
@@ -1082,6 +1086,8 @@ function writeVisitorLog(ip, method, reqPath, status, ua, referer) {
   logBatch.push(entry);
   if (logBatch.length >= LOG_BATCH_SIZE) {
     flushLogBatch();
+  } else if (!logFlushTimer) {
+    logFlushTimer = setTimeout(flushLogBatch, LOG_BATCH_DELAY);
   }
 }
 
@@ -1246,6 +1252,40 @@ const server = http.createServer(async (req, res) => {
   if (pathname === '/api/status') {
     if (!checkAdminKey(req)) return sendJson(res, 401, { message: 'Unauthorized' });
     return sendJson(res, 200, { running: true, pid: process.pid, startTime: SERVER_START });
+  }
+
+  if (pathname === '/api/errors' && req.method === 'GET') {
+    if (!checkAdminKey(req)) return sendJson(res, 401, { message: 'Unauthorized' });
+    let text = '';
+    try {
+      text = fs.readFileSync(ERRORS_FILE, 'utf8');
+    } catch (error) {
+      if (error.code !== 'ENOENT') {
+        console.error('Failed to read error log:', error.message);
+        return sendJson(res, 500, { message: 'Failed to read error log' });
+      }
+    }
+    const entries = text.split(/\r?\n/).filter(Boolean).map(line => {
+      try {
+        const entry = JSON.parse(line);
+        if (entry && typeof entry === 'object' && !Array.isArray(entry)) {
+          return {
+            t: String(entry.t || ''),
+            src: String(entry.src || 'server'),
+            msg: String(entry.msg || ''),
+            detail: entry.detail == null ? '' : String(entry.detail)
+          };
+        }
+      } catch {}
+      const match = line.match(/^\[([^\]]+)\]\s*(.*)$/);
+      return {
+        t: match ? match[1] : '',
+        src: 'server',
+        msg: match ? match[2] : line,
+        detail: ''
+      };
+    });
+    return sendJson(res, 200, entries);
   }
 
   if (pathname === '/api/logs' && req.method === 'GET') {
