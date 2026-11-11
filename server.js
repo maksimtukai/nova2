@@ -53,6 +53,8 @@ const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || '';
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 const SUPABASE_DISABLED = String(process.env.SUPABASE_DISABLED || '').toLowerCase() === 'true';
 const SUPABASE_ALLOW_ANON = String(process.env.SUPABASE_ALLOW_ANON || '').toLowerCase() === 'true';
+const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '';
+const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID || '';
 let supabase = null;
 
 let SUPABASE_KEY = '';
@@ -342,9 +344,41 @@ async function saveAnalytics(data) {
   }
 }
 
+async function sendTelegramVisitorNotification(event) {
+  if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) return;
+
+  const message = [
+    'Новый посетитель на Nova Studio',
+    `Страница: ${event.path || '/'}`,
+    `Время: ${event.ts}`,
+    `Источник: ${event.ref_host || 'прямой переход'}`
+  ].join('\n');
+
+  try {
+    const response = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: TELEGRAM_CHAT_ID,
+        text: message
+      }),
+      signal: AbortSignal.timeout(5000)
+    });
+    const result = await response.json();
+    if (!response.ok || !result.ok) {
+      throw new Error(`Telegram API returned HTTP ${response.status}`);
+    }
+  } catch (error) {
+    logError('Telegram visitor notification failed: ' + (error && error.message ? error.message : String(error)));
+  }
+}
+
 async function trackEvent(event) {
   const normalized = normalizeAnalyticsEvent(event.reqBody || event, event.req || null, (event && event.path) || '/');
   const analytics = await loadAnalytics();
+  if (normalized.event === 'session_start') {
+    await sendTelegramVisitorNotification(normalized);
+  }
   analytics.push(normalized);
   if (analytics.length > MAX_ANALYTICS_ENTRIES) {
     analytics.splice(0, analytics.length - MAX_ANALYTICS_ENTRIES);
