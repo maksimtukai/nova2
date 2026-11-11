@@ -214,9 +214,10 @@ function sanitizeMeta(value) {
 function detectDeviceType(ua) {
   const value = String(ua || '').toLowerCase();
   if (!value) return 'Unknown';
-  if (/ipad|tablet/.test(value)) return 'Tablet';
-  if (/mobile|iphone|android.+mobile|windows phone/.test(value)) return 'Mobile';
   if (/bot|spider|crawler|headless/.test(value)) return 'Bot';
+  if (/ipad|tablet/.test(value)) return 'Tablet';
+  if (/mobile|iphone|ipod|windows phone/.test(value)) return 'Mobile';
+  if (/android/.test(value)) return 'Tablet';
   return 'Desktop';
 }
 
@@ -370,8 +371,11 @@ async function sendTelegramVisitorNotification(event) {
     if (!response.ok || !result.ok) {
       throw new Error(`Telegram API returned HTTP ${response.status}`);
     }
+    console.info('Telegram visitor notification sent');
   } catch (error) {
-    logError('Telegram visitor notification failed: ' + (error && error.message ? error.message : String(error)));
+    const message = error && error.message ? error.message : String(error);
+    logError('Telegram visitor notification failed: ' + message);
+    console.error('Telegram visitor notification failed:', message);
   }
 }
 

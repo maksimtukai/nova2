@@ -67,6 +67,16 @@
     }
   }
 
+  function getDeviceType() {
+    const ua = String(navigator.userAgent || "").toLowerCase();
+    if (/bot|spider|crawler|headless/.test(ua)) return "Bot";
+    if (/ipad|tablet/.test(ua)) return "Tablet";
+    if (/iphone|ipod|mobile|windows phone/.test(ua)) return "Mobile";
+    if (/android/.test(ua)) return "Tablet";
+    if (/macintosh/.test(ua) && navigator.maxTouchPoints > 1) return "Tablet";
+    return "Desktop";
+  }
+
   function getPagePath() {
     if (location.protocol === "file:") {
       const fileName = location.pathname.split("/").filter(Boolean).pop() || "local-file";
@@ -93,6 +103,7 @@
       ref: document.referrer || "",
       language: navigator.language || "",
       timezone: getTimezone(),
+      deviceType: getDeviceType(),
       screen: {
         width: window.screen && window.screen.width ? window.screen.width : 0,
         height: window.screen && window.screen.height ? window.screen.height : 0

@@ -1,4 +1,4 @@
-const CACHE_NAME = "nova-cache-v22";
+const CACHE_NAME = "nova-cache-v23";
 const STATIC_SHELL = [
   "/style.css",
   "/cabinet.css",
