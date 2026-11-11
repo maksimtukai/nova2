@@ -351,7 +351,9 @@ async function sendTelegramVisitorNotification(event) {
     'Новый посетитель на Nova Studio',
     `Страница: ${event.path || '/'}`,
     `Время: ${event.ts}`,
-    `Источник: ${event.ref_host || 'прямой переход'}`
+    `Источник: ${event.ref_host || 'прямой переход'}`,
+    `Устройство: ${event.device_type || 'Unknown'} · ${event.os || 'Unknown'}`,
+    `Браузер: ${event.browser || 'Unknown'}${event.browser_version ? ` ${event.browser_version}` : ''}`
   ].join('\n');
 
   try {
